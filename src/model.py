@@ -33,7 +33,7 @@ class Simple_CNN(nn.Module,
             nn.Flatten(),
             nn.Linear(16 * 18 * 18, 1024),                  # 16*18*18*1024 = 5_308_416
             activation(),
-            nn.Linear(1024, out_dim)                        # 1024 * 136 = 139_264
+            nn.Linear(1024, out_dim),                        # 1024 * 136 = 139_264
             nn.Tanh()
         )
 
