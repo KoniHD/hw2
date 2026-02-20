@@ -4,6 +4,7 @@ import torch
 from torch.utils.data import Dataset
 import cv2
 from scipy.ndimage import gaussian_filter
+from PIL import Image
 import numpy as np
 import matplotlib.image as mpimg
 
@@ -28,11 +29,7 @@ class FacialKeypointsDataset(Dataset):
     def __getitem__(self, idx):
         image_name = os.path.join(self.root_dir, self.key_pts_frame.index[idx])
 
-        image = mpimg.imread(image_name)
-
-        # if image has an alpha color channel, get rid of it
-        if image.shape[2] == 4:
-            image = image[:, :, 0:3]
+        image = np.array(Image.open(image_name).convert('L'))
 
         key_pts = self.key_pts_frame.iloc[idx, :].values
         key_pts = key_pts.astype("float").reshape(-1, 2)
@@ -70,11 +67,7 @@ class FacialKeypointsHeatmapDataset(Dataset):
     def __getitem__(self, idx):
         image_name = os.path.join(self.root_dir, self.key_pts_frame.index[idx])
 
-        image = mpimg.imread(image_name)
-
-        # if image has an alpha color channel, get rid of it
-        if image.shape[2] == 4:
-            image = image[:, :, 0:3]
+        image = np.array(Image.open(image_name).convert('L'))
 
         key_pts = self.key_pts_frame.iloc[idx, :].values
         key_pts = key_pts.astype("float").reshape(-1, 2)

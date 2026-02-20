@@ -579,9 +579,6 @@ class NormalizeOriginal(object):
         image_copy = np.copy(image)
         key_pts_copy = np.copy(key_pts)
 
-        # convert image to grayscale
-        image_copy = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-
         # scale color range from [0, 255] to [0, 1]
         image_copy = image_copy / 255.0
 
