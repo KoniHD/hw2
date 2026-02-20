@@ -18,7 +18,7 @@ class FacialKeypointsDataset(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
-        self.key_pts_frame = pd.read_csv(csv_file, index_col=0).asype(np.float32)
+        self.key_pts_frame = pd.read_csv(csv_file, index_col=0).astype(np.float32)
         self.root_dir = root_dir
         self.transform = transform
 

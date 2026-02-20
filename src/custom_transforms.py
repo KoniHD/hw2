@@ -8,28 +8,20 @@ from torchvision import transforms
 
 
 class Normalize(object):
-    """Normalize the color range to [0,1] and convert a color image to grayscale if needed"""
-
-    def __init__(self, color=False):
-        self.color = color
+    """Normalize image to [0, 1] and keypoints to [-1, 1] relative to image dimensions."""
 
     def __call__(self, sample):
         image, key_pts = sample["image"], sample["keypoints"]
-
-        image_copy = np.copy(image)
-        key_pts_copy = np.copy(key_pts)
-
-        # convert image to grayscale
-        if not self.color:
-            image_copy = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        key_pts_copy = np.copy(key_pts).astype(np.float32)
 
         # scale color range from [0, 255] to [0, 1]
-        image_copy = image_copy / 255.0
+        image_normalized = image / 255.0
 
-        # scale keypoints to be centered around 0 with a range of [-2, 2]
-        key_pts_copy = (key_pts_copy - image.shape[0] / 2) / (image.shape[0] / 4)
+        h, w = image.shape
+        key_pts_copy[:, 0] = (key_pts_copy[:, 0] - w / 2) / (w / 2)  # x → [-1, 1]
+        key_pts_copy[:, 1] = (key_pts_copy[:, 1] - h / 2) / (h / 2)  # y → [-1, 1]
 
-        return {"image": image_copy, "keypoints": key_pts_copy}
+        return {"image": image_normalized, "keypoints": key_pts_copy}
 
 
 class Rescale(object):
@@ -570,20 +562,20 @@ class RandomRotate(object):
         return {"image": image_copy, "keypoints": new_keypoints}
 
 
-class NormalizeOriginal(object):
-    """Convert a color image to grayscale and normalize the color range to [0,1]."""
+# class NormalizeOriginal(object):
+#     """Convert a color image to grayscale and normalize the color range to [0,1]."""
 
-    def __call__(self, sample):
-        image, key_pts = sample["image"], sample["keypoints"]
+#     def __call__(self, sample):
+#         image, key_pts = sample["image"], sample["keypoints"]
 
-        image_copy = np.copy(image)
-        key_pts_copy = np.copy(key_pts)
+#         image_copy = np.copy(image)
+#         key_pts_copy = np.copy(key_pts)
 
-        # scale color range from [0, 255] to [0, 1]
-        image_copy = image_copy / 255.0
+#         # scale color range from [0, 255] to [0, 1]
+#         image_copy = image_copy / 255.0
 
-        # scale keypoints to be centered around 0 with a range of [-1, 1]
-        # mean = 100, sqrt = 50, so, pts should be (pts - 100)/50
-        key_pts_copy = (key_pts_copy - 100) / 50.0
+#         # scale keypoints to be centered around 0 with a range of [-1, 1]
+#         # mean = 100, sqrt = 50, so, pts should be (pts - 100)/50
+#         key_pts_copy = (key_pts_copy - 100) / 50.0
 
-        return {"image": image_copy, "keypoints": key_pts_copy}
+#         return {"image": image_copy, "keypoints": key_pts_copy}
