@@ -2,11 +2,10 @@ import os
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
-import cv2
 from scipy.ndimage import gaussian_filter
 from PIL import Image
 import numpy as np
-import matplotlib.image as mpimg
+
 
 class FacialKeypointsDataset(Dataset):
     """Face Landmarks dataset."""
@@ -29,7 +28,7 @@ class FacialKeypointsDataset(Dataset):
     def __getitem__(self, idx):
         image_name = os.path.join(self.root_dir, self.key_pts_frame.index[idx])
 
-        image = np.array(Image.open(image_name).convert('L'))
+        image = np.array(Image.open(image_name).convert("L"))
 
         key_pts = self.key_pts_frame.iloc[idx, :].values
         key_pts = key_pts.astype("float").reshape(-1, 2)
@@ -39,8 +38,6 @@ class FacialKeypointsDataset(Dataset):
             sample = self.transform(sample)
 
         return sample
-
-
 
 
 class FacialKeypointsHeatmapDataset(Dataset):
@@ -67,7 +64,7 @@ class FacialKeypointsHeatmapDataset(Dataset):
     def __getitem__(self, idx):
         image_name = os.path.join(self.root_dir, self.key_pts_frame.index[idx])
 
-        image = np.array(Image.open(image_name).convert('L'))
+        image = np.array(Image.open(image_name).convert("L"))
 
         key_pts = self.key_pts_frame.iloc[idx, :].values
         key_pts = key_pts.astype("float").reshape(-1, 2)
@@ -79,10 +76,9 @@ class FacialKeypointsHeatmapDataset(Dataset):
         # Generate heatmaps
         heatmaps = self.generate_heatmaps(sample["keypoints"])
         sample["heatmaps"] = heatmaps
-        
+
         return sample
 
-    
     def generate_heatmaps(self, keypoints):
         """
         Generate heatmaps for each keypoint
@@ -94,37 +90,41 @@ class FacialKeypointsHeatmapDataset(Dataset):
         # Convert keypoints to numpy if it's a tensor
         if isinstance(keypoints, torch.Tensor):
             keypoints = keypoints.numpy()
-        
+
         num_keypoints = keypoints.shape[0]
-        heatmaps = np.zeros((num_keypoints, self.output_size, self.output_size), dtype=np.float32)
-        
-       
+        heatmaps = np.zeros(
+            (num_keypoints, self.output_size, self.output_size), dtype=np.float32
+        )
+
         keypoints_scaled = keypoints * 50 + 100
-        
+
         # Generate a heatmap for each keypoint
         for i in range(num_keypoints):
             # Get the scaled coordinates
             x, y = keypoints_scaled[i]
-            
+
             # Skip if keypoint is invalid
             if np.isnan(x) or np.isnan(y):
                 continue
-            
+
             # Convert to int for indexing
-            x_int, y_int = max(0, min(self.output_size-1, int(x))), max(0, min(self.output_size-1, int(y)))
-            
+            x_int, y_int = (
+                max(0, min(self.output_size - 1, int(x))),
+                max(0, min(self.output_size - 1, int(y))),
+            )
+
             # Create a single hot pixel
             heatmap = np.zeros((self.output_size, self.output_size), dtype=np.float32)
             heatmap[y_int, x_int] = 1.0
-            
+
             # Apply gaussian filter to create a soft heatmap
             heatmap = gaussian_filter(heatmap, sigma=self.sigma)
-            heatmap = heatmap/heatmap.max()
-            
+            heatmap = heatmap / heatmap.max()
+
             # Normalize heatmap to 0-1 range
             if heatmap.max() > 0:
                 heatmap = heatmap / heatmap.max()
-                
+
             heatmaps[i] = heatmap
-        
+
         return torch.from_numpy(heatmaps)
