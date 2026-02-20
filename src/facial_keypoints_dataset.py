@@ -18,7 +18,7 @@ class FacialKeypointsDataset(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
-        self.key_pts_frame = pd.read_csv(csv_file, index_col=0)
+        self.key_pts_frame = pd.read_csv(csv_file, index_col=0).asype(np.float32)
         self.root_dir = root_dir
         self.transform = transform
 
@@ -28,7 +28,7 @@ class FacialKeypointsDataset(Dataset):
     def __getitem__(self, idx):
         image_name = os.path.join(self.root_dir, self.key_pts_frame.index[idx])
 
-        image = np.array(Image.open(image_name).convert("L"))
+        image = np.array(Image.open(image_name).convert("L")).astype(np.float32)
 
         key_pts = self.key_pts_frame.iloc[idx, :].values
         key_pts = key_pts.astype("float").reshape(-1, 2)
@@ -52,7 +52,7 @@ class FacialKeypointsHeatmapDataset(Dataset):
             output_size (int): Size of the output heatmaps (default: 64x64)
             sigma (float): Standard deviation for Gaussian kernel (default: 1)
         """
-        self.key_pts_frame = pd.read_csv(csv_file, index_col=0)
+        self.key_pts_frame = pd.read_csv(csv_file, index_col=0).astype(np.float32)
         self.root_dir = root_dir
         self.transform = transform
         self.output_size = output_size
@@ -64,7 +64,7 @@ class FacialKeypointsHeatmapDataset(Dataset):
     def __getitem__(self, idx):
         image_name = os.path.join(self.root_dir, self.key_pts_frame.index[idx])
 
-        image = np.array(Image.open(image_name).convert("L"))
+        image = np.array(Image.open(image_name).convert("L")).astype(np.float32)
 
         key_pts = self.key_pts_frame.iloc[idx, :].values
         key_pts = key_pts.astype("float").reshape(-1, 2)

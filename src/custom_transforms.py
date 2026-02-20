@@ -324,8 +324,8 @@ class ToTensor(object):
         # torch image: C X H X W
         image = image.transpose((2, 0, 1))
         return {
-            "image": torch.from_numpy(image.astype(np.float32)),
-            "keypoints": torch.from_numpy(key_pts.astype(np.float32)),
+            "image": torch.from_numpy(image),
+            "keypoints": torch.from_numpy(key_pts),
         }
 
 
