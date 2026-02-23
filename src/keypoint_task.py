@@ -1,5 +1,4 @@
 import lightning as L
-import torch
 import torch.nn as nn
 import torch.optim as optim
 
@@ -12,8 +11,9 @@ class KeypointDetection(L.LightningModule):
         criterion: str = "mse",
         patience: int = 5,
         optimizer: str = "adam",
-        activation: str = "relu",
-        drouput: float = 0.3,
+        activation: str = "relu",  # only used for tracking hparams
+        drouput: float = 0.3,  # only used for tracking hparams
+        batch_norm: bool = True,  # only used for tracking hparams
     ):
         super().__init__()
 
