@@ -14,9 +14,7 @@ class KeypointDetection(L.LightningModule):
         self.criterion = nn.MSELoss() if criterion == "mse" else nn.SmoothL1Loss()
 
     def forward(self, input):
-        self.model.eval()
-        with torch.no_grad():
-            return self.model(input)
+        return self.model(input)
 
     def _shared_step(self, batch, stage: str):
         inputs, targets = batch["image"], batch["keypoints"]
