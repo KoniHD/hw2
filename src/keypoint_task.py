@@ -5,13 +5,27 @@ import torch.optim as optim
 
 
 class KeypointDetection(L.LightningModule):
-    def __init__(self, model: nn.Module, lr: float = 4e-3, criterion: str = "mse"):
+    def __init__(
+        self,
+        model: nn.Module,
+        lr: float = 4e-3,
+        criterion: str = "mse",
+        patience: int = 5,
+        optimizer: str = "adam",
+    ):
         super().__init__()
 
         self.save_hyperparameters(ignore=["model"])
 
         self.model = model
         self.criterion = nn.MSELoss() if criterion == "mse" else nn.SmoothL1Loss()
+        self.lr = lr
+        self.patience = patience
+        self.optimizer = (
+            optim.Adam(self.parameters(), lr=self.lf)
+            if optimizer == "adam"
+            else optim.SGD(self.parameters(), lr=self.lf)
+        )
 
     def forward(self, input):
         return self.model(input)
@@ -24,7 +38,6 @@ class KeypointDetection(L.LightningModule):
             f"{stage}_loss",
             loss,
             prog_bar=True,
-            on_step=(stage == "train"),
             on_epoch=True,
             logger=True,
         )
@@ -43,4 +56,4 @@ class KeypointDetection(L.LightningModule):
         return self(input)
 
     def configure_optimizers(self):
-        return optim.Adam(self.parameters(), lr=self.hparams.lr)
+        return self.optimizer
