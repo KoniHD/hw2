@@ -46,20 +46,20 @@ class Simple_CNN(
             nn.Conv2d(1, 8, kernel_size=5, padding=1),  # [B, 8, 222, 222]
             nn.BatchNorm2d(8),
             act(),
-            nn.Dropout(p=dropout),
             nn.MaxPool2d(2, stride=2),  # [B, 8, 111, 111]
+            nn.Dropout(p=dropout),
             # Block 2
             nn.Conv2d(8, 16, kernel_size=4, padding=1),  # [B, 16, 110, 110]
             nn.BatchNorm2d(16),
             act(),
-            nn.Dropout(p=dropout),
             nn.MaxPool2d(2, stride=2),  # [B, 16, 55, 55]
+            nn.Dropout(p=dropout),
             # Block 3
             nn.Conv2d(16, 16, kernel_size=4, padding=1),  # [B, 16, 54, 54]
             nn.BatchNorm2d(16),
             act(),
-            nn.Dropout(p=dropout),
             nn.MaxPool2d(3, stride=3),  # [B, 16, 18, 18]
+            nn.Dropout(p=dropout),
             nn.Flatten(),  # [B, 16 * 18 * 18] = [B, 5184]
             # FC Layers with Dropout
             nn.Linear(16 * 18 * 18, 1024),  # [B, 1024]
