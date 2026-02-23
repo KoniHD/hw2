@@ -12,6 +12,8 @@ class KeypointDetection(L.LightningModule):
         criterion: str = "mse",
         patience: int = 5,
         optimizer: str = "adam",
+        activation: str = "relu",
+        drouput: float = 0.3,
     ):
         super().__init__()
 
