@@ -10,7 +10,7 @@ import numpy as np
 class FacialKeypointsDataset(Dataset):
     """Face Landmarks dataset."""
 
-    def __init__(self, csv_file, root_dir, transform=None):
+    def __init__(self, csv_file: str, root_dir: str, transform=None) -> None:
         """
         Args:
             csv_file (string): Path to the csv file with annotations.
@@ -22,10 +22,10 @@ class FacialKeypointsDataset(Dataset):
         self.root_dir = root_dir
         self.transform = transform
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.key_pts_frame)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> dict[str, torch.Tensor]:
         image_name = os.path.join(self.root_dir, self.key_pts_frame.index[idx])
 
         image = np.array(Image.open(image_name).convert("L")).astype(np.float32)
@@ -43,7 +43,14 @@ class FacialKeypointsDataset(Dataset):
 class FacialKeypointsHeatmapDataset(Dataset):
     """Face Landmarks dataset with heatmap generation."""
 
-    def __init__(self, csv_file, root_dir, transform=None, output_size=64, sigma=1):
+    def __init__(
+        self,
+        csv_file: str,
+        root_dir: str,
+        transform=None,
+        output_size: int = 64,
+        sigma: float = 1,
+    ) -> None:
         """
         Args:
             csv_file (string): Path to the csv file with annotations.
@@ -58,10 +65,10 @@ class FacialKeypointsHeatmapDataset(Dataset):
         self.output_size = output_size
         self.sigma = sigma
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.key_pts_frame)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> dict[str, torch.Tensor]:
         image_name = os.path.join(self.root_dir, self.key_pts_frame.index[idx])
 
         image = np.array(Image.open(image_name).convert("L")).astype(np.float32)
@@ -79,7 +86,7 @@ class FacialKeypointsHeatmapDataset(Dataset):
 
         return sample
 
-    def generate_heatmaps(self, keypoints):
+    def generate_heatmaps(self, keypoints) -> torch.Tensor:
         """
         Generate heatmaps for each keypoint
         Args:
