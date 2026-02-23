@@ -21,11 +21,6 @@ class KeypointDetection(L.LightningModule):
         self.criterion = nn.MSELoss() if criterion == "mse" else nn.SmoothL1Loss()
         self.lr = lr
         self.patience = patience
-        self.optimizer = (
-            optim.Adam(self.parameters(), lr=self.lf)
-            if optimizer == "adam"
-            else optim.SGD(self.parameters(), lr=self.lf)
-        )
 
     def forward(self, input):
         return self.model(input)
@@ -56,4 +51,9 @@ class KeypointDetection(L.LightningModule):
         return self(input)
 
     def configure_optimizers(self):
+        self.optimizer = (
+            optim.Adam(self.parameters(), lr=self.lr)
+            if self.hparams.optimizer == "adam"
+            else optim.SGD(self.parameters(), lr=self.lr)
+        )
         return self.optimizer
