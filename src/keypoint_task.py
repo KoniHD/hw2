@@ -34,6 +34,7 @@ class KeypointDetection(L.LightningModule):
             loss,
             prog_bar=True,
             on_epoch=True,
+            on_step=False,
             logger=True,
         )
         return loss
