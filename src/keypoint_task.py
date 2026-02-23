@@ -16,7 +16,7 @@ class KeypointDetection(L.LightningModule):
     def forward(self, input):
         self.model.eval()
         with torch.no_grad():
-            return self(input)
+            return self.model(input)
 
     def _shared_step(self, batch, stage: str):
         inputs, targets = batch["image"], batch["keypoints"]
