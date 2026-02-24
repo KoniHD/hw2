@@ -82,7 +82,7 @@ class Simple_CNN(
                         "conv",
                         nn.Conv2d(16, 16, kernel_size=4, padding=1),
                     ),  # [B, 16, 54, 54]
-                    ("bn", nn.BatchNorm2d(16) if self.batch_norm else nn.Identity),
+                    ("bn", nn.BatchNorm2d(16) if self.batch_norm else nn.Identity()),
                     ("act", act()),
                     ("pool", nn.MaxPool2d(3, stride=3)),  # [B, 16, 18, 18]
                 ]
