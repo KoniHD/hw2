@@ -5,7 +5,7 @@ import torch.nn as nn
 
 
 def visualize_batch(model: nn.Module, batch: dict) -> None:
-    device = model.device
+    device = next(model.parameters()).device
     images, keypoints = batch["image"].to(device), batch["keypoints"].to(device)
     model.eval()
     with torch.inference_mode():
