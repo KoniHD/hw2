@@ -87,7 +87,8 @@ class Simple_CNN(
                 ("bn1", nn.BatchNorm1d(1024) if self.batch_norm else nn.Identity()),
                 ("act1", act()),
                 ("dropout1", nn.Dropout(p=dropout)),
-                ("fc2", nn.Linear(1024, out_dim))("tanh", nn.Tanh()),  # [B, out_dim]
+                ("fc2", nn.Linear(1024, out_dim)),
+                ("tanh", nn.Tanh()),  # [B, out_dim]
             ]
         )
 
