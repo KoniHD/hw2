@@ -36,7 +36,7 @@ class Simple_CNN(
         assert activation in ACTIVATION_MAP, (
             f"activation must be one of {list(ACTIVATION_MAP.keys())}"
         )
-        assert 0.0 <= dropout < 1.0, "drouput must be in [0, 1)"
+        assert 0.0 <= dropout < 1.0, "droput must be in [0, 1)"
 
         super().__init__()
 
