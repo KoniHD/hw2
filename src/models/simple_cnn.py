@@ -61,9 +61,10 @@ class Simple_CNN(
                 (
                     "conv",
                     nn.Conv2d(8, 16, kernel_size=4, padding=1),
-                )(  # [B, 16, 110, 110]
-                    "bn", nn.BatchNorm2d(16) if self.batch_norm else nn.Identity()
-                )("act", act())("pool", nn.MaxPool2d(2, stride=2))  # [B, 16, 55, 55]
+                ),  # [B, 16, 110, 110]
+                ("bn", nn.BatchNorm2d(16) if self.batch_norm else nn.Identity()),
+                ("act", act()),
+                ("pool", nn.MaxPool2d(2, stride=2)),  # [B, 16, 55, 55]
             ]
         )
 
@@ -72,21 +73,21 @@ class Simple_CNN(
                 (
                     "conv",
                     nn.Conv2d(16, 16, kernel_size=4, padding=1),
-                )(  # [B, 16, 54, 54]
-                    "bn", nn.BatchNorm2d(16) if self.batch_norm else nn.Identity
-                )("act", act())("pool", nn.MaxPool2d(3, stride=3))  # [B, 16, 18, 18]
+                ),  # [B, 16, 54, 54]
+                ("bn", nn.BatchNorm2d(16) if self.batch_norm else nn.Identity),
+                ("act", act()),
+                ("pool", nn.MaxPool2d(3, stride=3)),  # [B, 16, 18, 18]
             ]
         )
 
         self.fc_head = nn.Sequential(
             OrderedDict[
-                ("flatten", nn.Flatten())(  # [B, 16 * 18 * 18] = [B, 5184]
-                    "fc1", nn.Linear(16 * 18 * 18, 1024)
-                )("bn1", nn.BatchNorm1d(1024) if self.batch_norm else nn.Identity())(
-                    "act1", act()
-                )("dropout1", nn.Dropout(p=dropout))("fc2", nn.Linear(1024, out_dim))(
-                    "tanh", nn.Tanh()
-                )
+                ("flatten", nn.Flatten()),  # [B, 16 * 18 * 18] = [B, 5184]
+                ("fc1", nn.Linear(16 * 18 * 18, 1024)),
+                ("bn1", nn.BatchNorm1d(1024) if self.batch_norm else nn.Identity()),
+                ("act1", act()),
+                ("dropout1", nn.Dropout(p=dropout)),
+                ("fc2", nn.Linear(1024, out_dim))("tanh", nn.Tanh()),  # [B, out_dim]
             ]
         )
 
