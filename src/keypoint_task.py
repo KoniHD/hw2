@@ -10,8 +10,8 @@ class KeypointDetection(L.LightningModule):
         model: nn.Module,
         lr: float = 4e-3,
         criterion: str = "mse",
-        patience: int = 5,
         optimizer: str = "adam",
+        patience: int = 5,  # only used for tracking hparams
         activation: str = "relu",  # only used for tracking hparams
         droput: float = 0.3,  # only used for tracking hparams
         batch_norm: bool = True,  # only used for tracking hparams
@@ -23,7 +23,6 @@ class KeypointDetection(L.LightningModule):
         self.model = model
         self.criterion = nn.MSELoss() if criterion == "mse" else nn.SmoothL1Loss()
         self.lr = lr
-        self.patience = patience
         self.example_input_array = torch.zeros(1, 1, 224, 224)
 
     def forward(self, input):
