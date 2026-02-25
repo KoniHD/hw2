@@ -59,9 +59,14 @@ class KeypointDetection(L.LightningModule):
         return self(input)
 
     def configure_optimizers(self):
+        if self.hparams.pretrained_backbone:
+            parameters = self.model.head.parameters()
+        else:
+            parameters = self.parameters()
+
         self.optimizer = (
-            optim.Adam(self.parameters(), lr=self.lr)
+            optim.Adam(parameters, lr=self.lr)
             if self.hparams.optimizer == "adam"
-            else optim.SGD(self.parameters(), lr=self.lr)
+            else optim.SGD(parameters, lr=self.lr)
         )
         return self.optimizer
