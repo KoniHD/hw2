@@ -27,7 +27,7 @@ class KeypointDetection(L.LightningModule):
         self.example_input_array = torch.zeros(1, 1, 224, 224)
 
         if pretrained_backbone:
-            self.backend = self.model.backbone
+            self.backbone = self.model.backbone
 
     def forward(self, input):
         return self.model(input)
