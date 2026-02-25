@@ -11,6 +11,7 @@ class KeypointDetection(L.LightningModule):
         lr: float = 4e-3,
         criterion: str = "mse",
         optimizer: str = "adam",
+        pretrained_backbone: bool = False,
         patience: int = 5,  # only used for tracking hparams
         activation: str = "relu",  # only used for tracking hparams
         droput: float = 0.3,  # only used for tracking hparams
@@ -24,6 +25,9 @@ class KeypointDetection(L.LightningModule):
         self.criterion = nn.MSELoss() if criterion == "mse" else nn.SmoothL1Loss()
         self.lr = lr
         self.example_input_array = torch.zeros(1, 1, 224, 224)
+
+        if pretrained_backbone:
+            self.backend = self.model.backbone
 
     def forward(self, input):
         return self.model(input)
