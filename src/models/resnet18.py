@@ -14,7 +14,6 @@ class ResNetKeypointDetector(
         self,
         out_dim: int = 136,
         grayScale: bool = True,
-        freeze_backbone: bool = True,
     ) -> None:
         assert out_dim % 2 == 0, "out_dim must be divisible by 2"
         super().__init__()
@@ -38,9 +37,6 @@ class ResNetKeypointDetector(
             nn.Linear(256, out_dim),
             nn.Tanh(),
         )
-
-        if freeze_backbone:
-            self.freeze_backbone()
 
     def freeze_backbone(self):
         for param in self.backbone.parameters():
