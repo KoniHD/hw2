@@ -1,5 +1,5 @@
-import torch.nn as nn
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 from huggingface_hub import PyTorchModelHubMixin
 
@@ -94,18 +94,18 @@ class UNetKeypointDetector(
         self.enc4 = Encoder(f * 4, f * 8, activation)
 
         self.bottleneck = nn.Sequential(
-            nn.Conv2d(f * 8, f * 8, kernel_size=3, padding=1),
-            nn.BatchNorm2d(f * 8),
+            nn.Conv2d(f * 8, f * 16, kernel_size=3, padding=1),
+            nn.BatchNorm2d(f * 16),
             act(),
-            nn.Conv2d(f * 8, f * 8, kernel_size=3, padding=1),
-            nn.BatchNorm2d(f * 8),
+            nn.Conv2d(f * 16, f * 16, kernel_size=3, padding=1),
+            nn.BatchNorm2d(f * 16),
             act(),
         )
 
-        self.dec4 = Decoder(f * 8, f * 4, activation)
-        self.dec3 = Decoder(f * 4, f * 2, activation)
-        self.dec2 = Decoder(f * 2, f, activation)
-        self.dec1 = Decoder(f, f, activation)
+        self.dec4 = Decoder(f * 16, f * 8, activation)
+        self.dec3 = Decoder(f * 8, f * 4, activation)
+        self.dec2 = Decoder(f * 4, f * 2, activation)
+        self.dec1 = Decoder(f * 2, f, activation)
 
         self.head = nn.Conv2d(f, num_predictions, kernel_size=1)
 
@@ -115,9 +115,9 @@ class UNetKeypointDetector(
         x, skip2 = self.enc2(x)  # [B, 128, 110, 110]
         x, skip3 = self.enc3(x)  # [B, 256, 55, 55]
         x, skip4 = self.enc4(x)  # [B, 512, 28, 28]
-        x = self.bottleneck(x)  # [B, 512, 28, 28]
-        x = self.dec4(x, skip4)  # [B, 256, 55, 55]
-        x = self.dec3(x, skip3)  # [B, 128, 110, 110]
-        x = self.dec2(x, skip2)  # [B, 64, 220, 220]
+        x = self.bottleneck(x)  # [B, 1024, 28, 28]
+        x = self.dec4(x, skip4)  # [B, 512, 56, 56]
+        x = self.dec3(x, skip3)  # [B, 256, 112, 112]
+        x = self.dec2(x, skip2)  # [B, 128, 224, 224]
         x = self.dec1(x, skip1)  # [B, 64, 224, 224]
-        return self.head(x)  # [B, 1, 224, 224]
+        return self.head(x)  # [B, num_predictions, 224, 224]
