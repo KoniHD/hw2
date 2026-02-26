@@ -7,7 +7,7 @@ from data.facial_keypoints_dataset import (
     FacialKeypointsDataset,
     FacialKeypointsHeatmapDataset,
 )
-from data.custom_transforms import ToTensor, Rescale, RandomCrop, RandomHorizontalFlip
+from data.custom_transforms import ToTensor, Rescale, RandomCrop, Normalize
 
 __all__ = [
     "Simple_CNN",
@@ -21,5 +21,5 @@ __all__ = [
     "ToTensor",
     "Rescale",
     "RandomCrop",
-    "RandomHorizontalFlip",
+    "Normalize",
 ]
