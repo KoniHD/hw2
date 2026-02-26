@@ -103,7 +103,8 @@ class FacialKeypointsHeatmapDataset(Dataset):
             (num_keypoints, self.output_size, self.output_size), dtype=np.float32
         )
 
-        keypoints_scaled = keypoints * 50 + 100
+        # keypoints are in [-1, 1], map them to [0, output_size - 1]
+        keypoints_scaled = (keypoints + 1.0) / 2.0 * (self.output_size - 1)
 
         # Generate a heatmap for each keypoint
         for i in range(num_keypoints):
