@@ -14,7 +14,7 @@ class KeypointDetection(L.LightningModule):
         pretrained_backbone: bool = False,
         patience: int = 5,  # only used for tracking hparams
         activation: str = "relu",  # only used for tracking hparams
-        droput: float = 0.3,  # only used for tracking hparams
+        dropout: float = 0.3,  # only used for tracking hparams
         batch_norm: bool = True,  # only used for tracking hparams
     ):
         super().__init__()
