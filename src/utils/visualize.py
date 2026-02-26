@@ -49,3 +49,62 @@ def visualize_loss_curve(logs: str, title: str) -> None:
     ax.legend()
     plt.tight_layout()
     plt.show()
+
+
+def visualize_heatmaps(model, batch):
+    device = next(model.parameters()).device
+    images, heatmaps = batch["image"].to(device), batch["heatmaps"].to(device)
+
+    model.eval()
+    with torch.inference_mode():
+        outputs = model(images)
+
+    # We will visualize the first image in the batch
+    idx = 0
+    img = images[idx].cpu().numpy().transpose(1, 2, 0)
+
+    # Get heatmaps
+    heatmaps_target = heatmaps[idx].cpu()
+    pred_hm = outputs[idx].cpu()  # [68, 64, 64]
+    c, h, w = pred_hm.shape
+
+    # Extract argmax from predicted heatmaps
+    pred_hm_flat = pred_hm.view(c, -1)
+    argmax_idx = pred_hm_flat.argmax(dim=-1)
+
+    # Convert 1D indices back to 2D (y, x)
+    pred_y = argmax_idx // w
+    pred_x = argmax_idx % w
+
+    # Resize coordinates back to original image size (224x224)
+    scale_y = img.shape[0] / h
+    scale_x = img.shape[1] / w
+    pred_y = pred_y.float() * scale_y
+    pred_x = pred_x.float() * scale_x
+
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
+
+    # Plot Image with Predicted Points
+    ax1.imshow(img, cmap="gray")
+    ax1.scatter(pred_x, pred_y, c="r", s=10, label="Predicted")
+    ax1.set_title("Predicted Keypoints (Argmax)")
+    ax1.axis("off")
+    ax1.legend()
+
+    # Visualize Heatmap overlay
+    ax2.imshow(img, cmap="gray")
+    # Overlay the max heatmap across all keypoints
+    max_hm, _ = torch.max(pred_hm, dim=0)
+    ax2.imshow(max_hm, cmap="jet", alpha=0.5, extent=[0, img.shape[1], img.shape[0], 0])
+    ax2.set_title("Predicted Heatmaps Overlay")
+    ax2.axis("off")
+
+    ax3.imshow(img, cmap="gray")
+    max_target_hm, _ = torch.max(heatmaps_target, dim=0)
+    ax3.imshow(
+        max_target_hm, cmap="jet", alpha=0.5, extent=[0, img.shape[1], img.shape[0], 0]
+    )
+    ax3.set_title("Ground Truth Heatmaps")
+    ax3.axis("off")
+
+    plt.show()
