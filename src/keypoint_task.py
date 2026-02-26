@@ -33,9 +33,16 @@ class KeypointDetection(L.LightningModule):
         return self.model(input)
 
     def _shared_step(self, batch, stage: str):
-        inputs, targets = batch["image"], batch["keypoints"]
+        inputs = batch["image"]
         outputs = self(inputs)
-        loss = self.criterion(outputs, targets.view(targets.size(0), -1))
+        if outputs.ndim == 2:  # Direct Coordinate Regression
+            targets = batch["keypoints"]
+            loss = self.criterion(outputs, targets.view(targets.size(0), -1))
+        elif outputs.ndim == 4:  # 2D Heatmap Regression
+            targets = batch["heatmaps"]
+            loss = self.criterion(outputs, targets)
+        else:
+            raise ValueError("No valid output shape")
         self.log(
             f"{stage}_loss",
             loss,

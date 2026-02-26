@@ -126,9 +126,8 @@ class FacialKeypointsHeatmapDataset(Dataset):
 
             # Apply gaussian filter to create a soft heatmap
             heatmap = gaussian_filter(heatmap, sigma=self.sigma)
-            heatmap = heatmap / heatmap.max()
 
-            # Normalize heatmap to 0-1 range
+            # Normalize heatmap to [0, 1] range
             if heatmap.max() > 0:
                 heatmap = heatmap / heatmap.max()
 
