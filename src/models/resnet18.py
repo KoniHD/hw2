@@ -25,7 +25,7 @@ class ResNetKeypointDetector(
             backbone.conv1 = nn.Conv2d(
                 1, 64, kernel_size=7, stride=2, padding=3, bias=False
             )
-            backbone.conv1.weight.data = original_weight.sum(dim=1, keepdim=True)
+            backbone.conv1.weight.data = original_weight.mean(dim=1, keepdim=True)
 
         self.backbone = nn.Sequential(*list(backbone.children())[:-1])
 

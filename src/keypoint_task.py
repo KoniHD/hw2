@@ -11,7 +11,7 @@ class KeypointDetection(L.LightningModule):
         lr: float = 4e-3,
         criterion: str = "mse",
         optimizer: str = "adam",
-        pretrained_backbone: bool = False,
+        pretrained_backbone: bool = False,  # only used for tracking hparams
         use_scheduler: bool = False,  # enable ReduceLROnPlateau
         patience: int = 5,  # only used for tracking hparams
         activation: str = "relu",  # only used for tracking hparams
@@ -32,7 +32,7 @@ class KeypointDetection(L.LightningModule):
         self.lr = lr
         self.example_input_array = torch.zeros(1, 1, 224, 224)
 
-        if pretrained_backbone:
+        if hasattr(self.model, "backbone"):
             self.backbone = self.model.backbone
 
     def forward(self, input):
@@ -72,7 +72,9 @@ class KeypointDetection(L.LightningModule):
         return self(input)
 
     def configure_optimizers(self):
-        if self.hparams.pretrained_backbone:
+        # Detect backbone/head dynamically from model structure.
+        # ResNet exposes both; UNet and SimpleCNN do not — avoids AttributeError.
+        if hasattr(self.model, "backbone") and hasattr(self.model, "head"):
             parameters = self.model.head.parameters()
         else:
             parameters = self.parameters()
