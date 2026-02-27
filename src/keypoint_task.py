@@ -12,6 +12,7 @@ class KeypointDetection(L.LightningModule):
         criterion: str = "mse",
         optimizer: str = "adam",
         pretrained_backbone: bool = False,
+        use_scheduler: bool = False,  # enable ReduceLROnPlateau
         patience: int = 5,  # only used for tracking hparams
         activation: str = "relu",  # only used for tracking hparams
         dropout: float = 0.3,  # only used for tracking hparams
@@ -81,4 +82,23 @@ class KeypointDetection(L.LightningModule):
             if self.hparams.optimizer == "adam"
             else optim.SGD(parameters, lr=self.lr)
         )
-        return self.optimizer
+
+        if not self.hparams.use_scheduler:
+            return self.optimizer
+
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+            self.optimizer,
+            mode="min",
+            factor=0.5,  # halve LR on plateau
+            patience=3,  # wait 3 epochs with no improvement
+            min_lr=1e-6,
+        )
+        return {
+            "optimizer": self.optimizer,
+            "lr_scheduler": {
+                "scheduler": scheduler,
+                "monitor": "train_loss",
+                "interval": "epoch",
+                "frequency": 1,
+            },
+        }
