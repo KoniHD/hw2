@@ -18,6 +18,10 @@ dependencies = [
     "torch~=2.10.0",
     "torchvision~=0.25.0",
     "tqdm~=4.67.3",
+    "numpy~=2.4.0",
+    "tensorboard~=2.17.0",
+    "ipywidgets>=8.1.8",
+    "safetensors>=0.7.0",
 ]
 
 [build-system]
@@ -31,7 +35,17 @@ py-modules = ["keypoint_task"]
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.uv.workspace]
+members = [
+    ".",
+    ".",
+]
+
+[tool.uv.sources]
+hw2 = { workspace = true }
+
 [dependency-groups]
 dev = [
+    "hw2",
     "ipykernel>=7.2.0",
 ]
