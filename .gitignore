@@ -15,3 +15,7 @@ exp/
 uv.lock
 
 *.pdf
+test*
+check*
+*.jpg
+*tmp*
