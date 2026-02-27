@@ -22,7 +22,12 @@ class KeypointDetection(L.LightningModule):
         self.save_hyperparameters(ignore=["model"])
 
         self.model = model
-        self.criterion = nn.MSELoss() if criterion == "mse" else nn.SmoothL1Loss()
+        if criterion == "mse":
+            self.criterion = nn.MSELoss()
+        elif criterion == "bce":
+            self.criterion = nn.BCEWithLogitsLoss()
+        else:
+            self.criterion = nn.SmoothL1Loss()
         self.lr = lr
         self.example_input_array = torch.zeros(1, 1, 224, 224)
 
