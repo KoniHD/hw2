@@ -93,6 +93,8 @@ class KeypointDetection(L.LightningModule):
             mode="min",
             factor=0.5,  # halve LR on plateau
             patience=3,  # wait 3 epochs with no improvement
+            threshold=1e-3,  # matches EarlyStopping min_delta
+            threshold_mode="abs",  # absolute, not relative — consistent with EarlyStopping
             min_lr=1e-6,
         )
         return {
