@@ -2,6 +2,8 @@ import lightning as L
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 class KeypointDetection(L.LightningModule):
@@ -38,7 +40,7 @@ class KeypointDetection(L.LightningModule):
     def forward(self, input):
         return self.model(input)
 
-    def _shared_step(self, batch, stage: str):
+    def _shared_step(self, batch, batch_idx: int, stage: str):
         inputs = batch["image"]
         outputs = self(inputs)
         if outputs.ndim == 2:  # Direct Coordinate Regression
@@ -57,16 +59,66 @@ class KeypointDetection(L.LightningModule):
             on_step=False,
             logger=True,
         )
+
+        if (
+            batch_idx == 0
+            and self.current_epoch % 5 == 0
+            and (stage == "val" or stage == "test")
+        ):
+            self._log_predicted_images(inputs, outputs, targets)
+
         return loss
 
-    def training_step(self, batch):
-        return self._shared_step(batch, "train")
+    def _log_predicted_images(self, images, outputs, targets, n=4):
+        fig, axes = plt.subplots(1, n, figsize=(4 * n, 4))
 
-    def validation_step(self, batch):
-        return self._shared_step(batch, "val")
+        for i in range(n):
+            img = images[i, 0].cpu().numpy()  # (H, W)
+            out = outputs[i].detach().cpu().numpy().reshape(68, 2)
+            tar = targets[i].cpu().numpy().reshape(68, 2)
+            h, w = img.shape
 
-    def test_step(self, batch):
-        return self._shared_step(batch, "test")
+            ax = axes[i]
+            ax.imshow(img, cmap="gray")
+            ax.scatter(
+                out[:, 0] * (w / 2) + (w / 2),
+                out[:, 1] * (h / 2) + (h / 2),
+                c="r",
+                s=10,
+                label="pred",
+            )
+            ax.scatter(
+                tar[:, 0] * (w / 2) + (w / 2),
+                tar[:, 1] * (h / 2) + (h / 2),
+                c="g",
+                s=10,
+                label="gt",
+            )
+            ax.axis("off")
+
+        axes[0].legend(loc="upper right", fontsize=7)
+        fig.tight_layout()
+        fig.canvas.draw()
+        buf = fig.canvas.buffer_rgba()
+        img_arr = np.asarray(buf)[..., :3]  # drop alpha channel → (H, W, 3)
+        plt.close(fig)
+
+        # TensorBoard expects (N, H, W, C) or (H, W, C)
+        self.logger.experiment.add_image(
+            "val/predictions",
+            img_arr,
+            global_step=self.current_epoch,
+            dataformats="HWC",
+        )
+
+    def training_step(self, batch, batch_idx):
+        return self._shared_step(batch, batch_idx, stage="train")
+
+    def validation_step(self, batch, batch_idx):
+        return self._shared_step(batch, batch_idx, "val")
+
+    def test_step(self, batch, batch_idx):
+        return self._shared_step(batch, batch_idx, "test")
 
     def predict_step(self, input):
         return self(input)
