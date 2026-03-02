@@ -27,9 +27,16 @@ class ResNetKeypointDetector(
             )
             backbone.conv1.weight.data = original_weight.mean(dim=1, keepdim=True)
 
-        self.head = nn.Linear(backbone.fc.in_features, out_dim)
-
         self.backbone = nn.Sequential(*list(backbone.children())[:-1])
+
+        self.head = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(backbone.fc.in_features, 256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, out_dim),
+            nn.Tanh(),
+        )
 
     def freeze_backbone(self):
         for param in self.backbone.parameters():
