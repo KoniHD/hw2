@@ -18,7 +18,7 @@ class ResNetKeypointDetector(
         assert out_dim % 2 == 0, "out_dim must be divisible by 2"
         super().__init__()
 
-        backbone = models.resnet18()
+        backbone = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
 
         if grayScale:
             original_weight = backbone.conv1.weight.data
@@ -27,16 +27,9 @@ class ResNetKeypointDetector(
             )
             backbone.conv1.weight.data = original_weight.mean(dim=1, keepdim=True)
 
-        self.backbone = nn.Sequential(*list(backbone.children())[:-1])
+        self.head = nn.Linear(backbone.fc.in_features, out_dim)
 
-        self.head = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(backbone.fc.in_features, 256),
-            nn.ReLU(),
-            nn.Dropout(0.3),
-            nn.Linear(256, out_dim),
-            nn.Tanh(),
-        )
+        self.backbone = nn.Sequential(*list(backbone.children())[:-1])
 
     def freeze_backbone(self):
         for param in self.backbone.parameters():
