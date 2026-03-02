@@ -4,10 +4,7 @@ __pycache__/
 build/
 dist/
 wheels/
-data/test
-data/training
-data/*.csv
-*.zip
+/data/
 exp/
 *.egg-info
 .python-version
@@ -22,7 +19,3 @@ test*
 check*
 *.jpg
 *tmp*
-
-!src/hw2/data/custom_transforms.py
-!src/hw2/data/facial_keypoints_dataset.py
-!src/hw2/data/__init__.py
