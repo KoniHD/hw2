@@ -1,6 +1,6 @@
 [project]
 name = "hw2"
-version = "0.1.0"
+version = "1.0.0"
 description = "Directory for homework 2"
 readme = "README.md"
 authors = [

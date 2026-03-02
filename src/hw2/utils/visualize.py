@@ -58,6 +58,7 @@ def visualize_heatmaps(model, batch):
     model.eval()
     with torch.inference_mode():
         outputs = model(images)
+        outputs = nn.Sigmoid()(outputs)
 
     # We will visualize the first image in the batch
     idx = 0
